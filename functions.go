@@ -16,9 +16,9 @@ var New = pkgerr.New
 var WithMessage = pkgerr.WithMessage
 var WithMessagef = pkgerr.WithMessagef
 
-func Match(err error, code string) bool {
+func Match(err error, key interface{}) bool {
 	for {
-		if x, ok := err.(interface{ Code() string }); ok && x.Code() == code {
+		if x, ok := err.(interface{ Match(interface{}) bool }); ok && x.Match(key) {
 			return true
 		}
 		if err = Unwrap(err); err == nil {

@@ -7,18 +7,25 @@ import (
 	pkgerr "github.com/pkg/errors"
 )
 
-type codedError struct {
+type withCodeAndMsg struct {
 	code    string
 	message string
 	error
 }
 
-func (c *codedError) Error() string {
+func (c *withCodeAndMsg) Error() string {
 	return c.message
 }
 
-func (c *codedError) Code() string {
+func (c *withCodeAndMsg) Code() string {
 	return c.code
+}
+
+func (c *withCodeAndMsg) Match(key interface{}) bool {
+	if x, ok := key.(string); ok {
+		return c.code == x
+	}
+	return false
 }
 
 // func (ce *codedError) Is(err error) bool {
@@ -29,7 +36,7 @@ func (c *codedError) Code() string {
 // 	return false
 // }
 
-func (c *codedError) Format(s fmt.State, verb rune) {
+func (c *withCodeAndMsg) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		fmt.Fprintf(s, "[%s] %s", c.Code(), c.Error())
@@ -41,11 +48,11 @@ func (c *codedError) Format(s fmt.State, verb rune) {
 }
 
 func CodErr(code string, message string) error {
-	return &codedError{code, message, nil}
+	return &withCodeAndMsg{code, message, nil}
 }
 
 func CodErrWithStack(code string, message string) error {
-	ce := &codedError{code, message, nil}
+	ce := &withCodeAndMsg{code, message, nil}
 	return pkgerr.WithStack(ce)
 }
 
@@ -53,5 +60,5 @@ func CodErrWrap(code string, message string, cause error) error {
 	if cause == nil {
 		return nil
 	}
-	return &codedError{code, message, WithStack(cause)}
+	return &withCodeAndMsg{code, message, WithStack(cause)}
 }
