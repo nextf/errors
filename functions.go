@@ -16,6 +16,8 @@ var New = pkgerr.New
 var WithMessage = pkgerr.WithMessage
 var WithMessagef = pkgerr.WithMessagef
 
+type StackTrace = pkgerr.StackTrace
+
 func Match(err error, key interface{}) bool {
 	for {
 		if x, ok := err.(interface{ Match(interface{}) bool }); ok && x.Match(key) {
@@ -43,7 +45,7 @@ func HasStackTrace(err error) bool {
 		return false
 	}
 	for {
-		if _, ok := err.(interface{ StackTrace() pkgerr.StackTrace }); ok {
+		if _, ok := err.(interface{ StackTrace() StackTrace }); ok {
 			return true
 		}
 		if err = Unwrap(err); err == nil {

@@ -56,3 +56,78 @@ func TestFormat(t *testing.T) {
 		t.Error("Unprinted stack.")
 	}
 }
+
+func TestWithStack(t *testing.T) {
+	err := errors.CodErr("ROOT", "Level 0")
+	times := 10
+	for i := 1; i < times; i++ {
+		err = errors.WithStack(err)
+	}
+	counter := 0
+	level := 0
+	for {
+		level++
+		if _, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+			counter++
+		}
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+	if counter != 1 {
+		t.Errorf("Expect %d, got %d", 1, counter)
+	}
+	if level != 2 {
+		t.Errorf("Expect %d, got %d", 1, level)
+	}
+}
+
+func TestWrap(t *testing.T) {
+	err := errors.CodErr("ROOT", "Level 0")
+	times := 10
+	for i := 1; i < times; i++ {
+		err = errors.Wrap(err, fmt.Sprintf("Level %d", i))
+	}
+	counter := 0
+	level := 0
+	for {
+		level++
+		if _, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+			counter++
+		}
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+	if counter != 1 {
+		t.Errorf("Expect %d, got %d", 1, counter)
+	}
+	if level != times+1 {
+		t.Errorf("Expect %d, got %d", times+1, level)
+	}
+}
+
+func TestWrapf(t *testing.T) {
+	err := errors.CodErr("ROOT", "Level 0")
+	times := 10
+	for i := 1; i < times; i++ {
+		err = errors.Wrapf(err, "Level %d", i)
+	}
+	counter := 0
+	level := 0
+	for {
+		level++
+		if _, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+			counter++
+		}
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+	if counter != 1 {
+		t.Errorf("Expect %d, got %d", 1, counter)
+	}
+	if level != times+1 {
+		t.Errorf("Expect %d, got %d", times+1, level)
+	}
+}
