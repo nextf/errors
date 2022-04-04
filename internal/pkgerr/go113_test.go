@@ -12,14 +12,14 @@ import (
 
 func TestErrorChainCompat(t *testing.T) {
 	err := stderrors.New("error that gets wrapped")
-	wrapped := Wrap(SkipPkgErr, err, "wrapped up")
+	wrapped := Wrap(0, err, "wrapped up")
 	if !stderrors.Is(wrapped, err) {
 		t.Errorf("Wrap does not support Go 1.13 error chains")
 	}
 }
 
 func TestIs(t *testing.T) {
-	err := New(SkipPkgErr, "test")
+	err := New(0, "test")
 
 	type args struct {
 		err    error
@@ -33,7 +33,7 @@ func TestIs(t *testing.T) {
 		{
 			name: "with stack",
 			args: args{
-				err:    WithStack(SkipPkgErr, err),
+				err:    WithStack(0, err),
 				target: err,
 			},
 			want: true,
@@ -93,7 +93,7 @@ func TestAs(t *testing.T) {
 		{
 			name: "with stack",
 			args: args{
-				err:    WithStack(SkipPkgErr, err),
+				err:    WithStack(0, err),
 				target: new(customErr),
 			},
 			want: true,
@@ -138,7 +138,7 @@ func TestAs(t *testing.T) {
 }
 
 func TestUnwrap(t *testing.T) {
-	err := New(SkipPkgErr, "test")
+	err := New(0, "test")
 
 	type args struct {
 		err error
@@ -150,7 +150,7 @@ func TestUnwrap(t *testing.T) {
 	}{
 		{
 			name: "with stack",
-			args: args{err: WithStack(SkipPkgErr, err)},
+			args: args{err: WithStack(0, err)},
 			want: err,
 		},
 		{

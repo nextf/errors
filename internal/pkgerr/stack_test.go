@@ -118,22 +118,22 @@ func TestStackTrace(t *testing.T) {
 		err  error
 		want []string
 	}{{
-		New(SkipPkgErr, "ooh"), []string{
+		New(0, "ooh"), []string{
 			"github.com/nextf/errors/internal/pkgerr.TestStackTrace\n" +
 				"\t.+/nextf/errors/internal/pkgerr/stack_test.go:121",
 		},
 	}, {
-		Wrap(SkipPkgErr, New(SkipPkgErr, "ooh"), "ahh"), []string{
+		Wrap(0, New(0, "ooh"), "ahh"), []string{
 			"github.com/nextf/errors/internal/pkgerr.TestStackTrace\n" +
 				"\t.+/nextf/errors/internal/pkgerr/stack_test.go:126", // this is the stack of Wrap, not New
 		},
 	}, {
-		Cause(Wrap(SkipPkgErr, New(SkipPkgErr, "ooh"), "ahh")), []string{
+		Cause(Wrap(0, New(0, "ooh"), "ahh")), []string{
 			"github.com/nextf/errors/internal/pkgerr.TestStackTrace\n" +
 				"\t.+/nextf/errors/internal/pkgerr/stack_test.go:131", // this is the stack of New
 		},
 	}, {
-		func() error { return New(SkipPkgErr, "ooh") }(), []string{
+		func() error { return New(0, "ooh") }(), []string{
 			`github.com/nextf/errors/internal/pkgerr.TestStackTrace.func1` +
 				"\n\t.+/nextf/errors/internal/pkgerr/stack_test.go:136", // this is the stack of New
 			"github.com/nextf/errors/internal/pkgerr.TestStackTrace\n" +
@@ -142,7 +142,7 @@ func TestStackTrace(t *testing.T) {
 	}, {
 		Cause(func() error {
 			return func() error {
-				return Errorf(SkipPkgErr, "hello %s", fmt.Sprintf("world: %s", "ooh"))
+				return Errorf(0, "hello %s", fmt.Sprintf("world: %s", "ooh"))
 			}()
 		}()), []string{
 			`github.com/nextf/errors/internal/pkgerr.TestStackTrace.func2.1` +

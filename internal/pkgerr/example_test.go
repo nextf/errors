@@ -5,14 +5,14 @@ import (
 )
 
 func ExampleNew() {
-	err := New(SkipPkgErr, "whoops")
+	err := New(0, "whoops")
 	fmt.Println(err)
 
 	// Output: whoops
 }
 
 func ExampleNew_printf() {
-	err := New(SkipPkgErr, "whoops")
+	err := New(0, "whoops")
 	fmt.Printf("%+v", err)
 
 	// Example output:
@@ -34,7 +34,7 @@ func ExampleNew_printf() {
 }
 
 func ExampleWithMessage() {
-	cause := New(SkipPkgErr, "whoops")
+	cause := New(0, "whoops")
 	err := WithMessage(cause, "oh noes")
 	fmt.Println(err)
 
@@ -42,16 +42,16 @@ func ExampleWithMessage() {
 }
 
 func ExampleWithStack() {
-	cause := New(SkipPkgErr, "whoops")
-	err := WithStack(SkipPkgErr, cause)
+	cause := New(0, "whoops")
+	err := WithStack(0, cause)
 	fmt.Println(err)
 
 	// Output: whoops
 }
 
 func ExampleWithStack_printf() {
-	cause := New(SkipPkgErr, "whoops")
-	err := WithStack(SkipPkgErr, cause)
+	cause := New(0, "whoops")
+	err := WithStack(0, cause)
 	fmt.Printf("%+v", err)
 
 	// Example Output:
@@ -87,18 +87,18 @@ func ExampleWithStack_printf() {
 }
 
 func ExampleWrap() {
-	cause := New(SkipPkgErr, "whoops")
-	err := Wrap(SkipPkgErr, cause, "oh noes")
+	cause := New(0, "whoops")
+	err := Wrap(0, cause, "oh noes")
 	fmt.Println(err)
 
 	// Output: oh noes: whoops
 }
 
 func fn() error {
-	e1 := New(SkipPkgErr, "error")
-	e2 := Wrap(SkipPkgErr, e1, "inner")
-	e3 := Wrap(SkipPkgErr, e2, "middle")
-	return Wrap(SkipPkgErr, e3, "outer")
+	e1 := New(0, "error")
+	e2 := Wrap(0, e1, "inner")
+	e3 := Wrap(0, e2, "middle")
+	return Wrap(0, e3, "outer")
 }
 
 func ExampleCause() {
@@ -141,15 +141,15 @@ func ExampleWrap_extended() {
 }
 
 func ExampleWrapf() {
-	cause := New(SkipPkgErr, "whoops")
-	err := Wrapf(SkipPkgErr, cause, "oh noes #%d", 2)
+	cause := New(0, "whoops")
+	err := Wrapf(0, cause, "oh noes #%d", 2)
 	fmt.Println(err)
 
 	// Output: oh noes #2: whoops
 }
 
 func ExampleErrorf_extended() {
-	err := Errorf(SkipPkgErr, "whoops: %s", "foo")
+	err := Errorf(0, "whoops: %s", "foo")
 	fmt.Printf("%+v", err)
 
 	// Example output:
@@ -191,9 +191,9 @@ func Example_stackTrace() {
 }
 
 func ExampleCause_printf() {
-	err := Wrap(SkipPkgErr, func() error {
+	err := Wrap(0, func() error {
 		return func() error {
-			return New(SkipPkgErr, "hello world")
+			return New(0, "hello world")
 		}()
 	}(), "failed")
 

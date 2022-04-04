@@ -3,8 +3,6 @@ package errors
 import (
 	"fmt"
 	"io"
-
-	pkgerr "github.com/nextf/errors/internal/pkgerr"
 )
 
 type withErrCode struct {
@@ -47,18 +45,17 @@ func (c *withErrCode) Format(s fmt.State, verb rune) {
 	}
 }
 
-func ErrCode(code string, message string) error {
+func NewErrCode(code string, message string) error {
 	return &withErrCode{code, message, nil}
 }
 
-func ErrCodeWithStack(code string, message string) error {
-	ce := &withErrCode{code, message, nil}
-	return pkgerr.WithStack(pkgerr.SkipPkgErr+1, ce)
+func NewErrCodeWithStack(code string, message string) error {
+	return withStackIfAbsent(1, &withErrCode{code, message, nil})
 }
 
-func ErrCodeWrap(code string, message string, cause error) error {
+func WrapErrCode(code string, message string, cause error) error {
 	if cause == nil {
 		return nil
 	}
-	return &withErrCode{code, message, WithStack(cause)}
+	return &withErrCode{code, message, withStackIfAbsent(1, cause)}
 }

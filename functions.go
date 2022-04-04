@@ -9,12 +9,9 @@ import (
 )
 
 var (
-	Is     = stderr.Is
-	As     = stderr.As
-	Unwrap = stderr.Unwrap
-
-	Errorf       = pkgerr.Errorf
-	NewSimple    = pkgerr.New
+	Is           = stderr.Is
+	As           = stderr.As
+	Unwrap       = stderr.Unwrap
 	WithMessage  = pkgerr.WithMessage
 	WithMessagef = pkgerr.WithMessagef
 )
@@ -57,6 +54,14 @@ func HasStackTrace(err error) bool {
 	}
 }
 
+func withStackIfAbsent(skipCounter int, err error) error {
+	if HasStackTrace(err) {
+		return err
+	} else {
+		return pkgerr.WithStack(skipCounter+1, err)
+	}
+}
+
 // var WithStack = pkgerr.WithStack
 func WithStack(err error) error {
 	if err == nil {
@@ -65,22 +70,26 @@ func WithStack(err error) error {
 	if HasStackTrace(err) {
 		return err
 	} else {
-		return pkgerr.WithStack(pkgerr.SkipPkgErr+1, err)
+		return withStackIfAbsent(1, err)
 	}
 }
 
 // var Wrap = pkgerr.Wrap
 func Wrap(err error, message string) error {
-	if err == nil {
-		return nil
-	}
-	return WithStack(WithMessage(err, message))
+	return withStackIfAbsent(1, WithMessage(err, message))
 }
 
 // var Wrapf = pkgerr.Wrapf
 func Wrapf(err error, format string, args ...interface{}) error {
-	if err == nil {
-		return nil
-	}
-	return Wrap(err, fmt.Sprintf(format, args...))
+	return withStackIfAbsent(1, WithMessage(err, fmt.Sprintf(format, args...)))
+}
+
+// var Errorf = pkgerr.Errorf
+func Errorf(format string, args ...interface{}) error {
+	return pkgerr.Errorf(1, format, args...)
+}
+
+// var NewWithStack = pkgerr.New
+func NewWithStack(message string) error {
+	return pkgerr.New(1, message)
 }

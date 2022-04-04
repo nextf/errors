@@ -10,8 +10,6 @@ import (
 	"strings"
 )
 
-const SkipPkgErr = 3
-
 // Frame represents a program counter inside a stack frame.
 // For historical reasons if Frame is interpreted as a uintptr
 // its value represents the program counter + 1.
@@ -163,10 +161,12 @@ func (s *stack) StackTrace() StackTrace {
 	return f
 }
 
-func callers(skip int) *stack {
+func callers(skipCounter int) *stack {
 	const depth = 32
+	const pkgerrStackSize = 3
+	skipCounter += pkgerrStackSize
 	var pcs [depth]uintptr
-	n := runtime.Callers(skip, pcs[:])
+	n := runtime.Callers(skipCounter, pcs[:])
 	var st stack = pcs[0:n]
 	return &st
 }

@@ -19,7 +19,7 @@ func noErrors(at, depth int) error {
 
 func yesErrors(at, depth int) error {
 	if at >= depth {
-		return New(SkipPkgErr, "ye error")
+		return New(0, "ye error")
 	}
 	return yesErrors(at+1, depth)
 }

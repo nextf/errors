@@ -15,21 +15,21 @@ func TestFormatNew(t *testing.T) {
 		format string
 		want   string
 	}{{
-		New(SkipPkgErr, "error"),
+		New(0, "error"),
 		"%s",
 		"error",
 	}, {
-		New(SkipPkgErr, "error"),
+		New(0, "error"),
 		"%v",
 		"error",
 	}, {
-		New(SkipPkgErr, "error"),
+		New(0, "error"),
 		"%+v",
 		"error\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatNew\n" +
 			"\t.+/nextf/errors/internal/pkgerr/format_test.go:26",
 	}, {
-		New(SkipPkgErr, "error"),
+		New(0, "error"),
 		"%q",
 		`"error"`,
 	}}
@@ -45,15 +45,15 @@ func TestFormatErrorf(t *testing.T) {
 		format string
 		want   string
 	}{{
-		Errorf(SkipPkgErr, "%s", "error"),
+		Errorf(0, "%s", "error"),
 		"%s",
 		"error",
 	}, {
-		Errorf(SkipPkgErr, "%s", "error"),
+		Errorf(0, "%s", "error"),
 		"%v",
 		"error",
 	}, {
-		Errorf(SkipPkgErr, "%s", "error"),
+		Errorf(0, "%s", "error"),
 		"%+v",
 		"error\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatErrorf\n" +
@@ -71,43 +71,43 @@ func TestFormatWrap(t *testing.T) {
 		format string
 		want   string
 	}{{
-		Wrap(SkipPkgErr, New(SkipPkgErr, "error"), "error2"),
+		Wrap(0, New(0, "error"), "error2"),
 		"%s",
 		"error2: error",
 	}, {
-		Wrap(SkipPkgErr, New(SkipPkgErr, "error"), "error2"),
+		Wrap(0, New(0, "error"), "error2"),
 		"%v",
 		"error2: error",
 	}, {
-		Wrap(SkipPkgErr, New(SkipPkgErr, "error"), "error2"),
+		Wrap(0, New(0, "error"), "error2"),
 		"%+v",
 		"error\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWrap\n" +
 			"\t.+/nextf/errors/internal/pkgerr/format_test.go:82",
 	}, {
-		Wrap(SkipPkgErr, io.EOF, "error"),
+		Wrap(0, io.EOF, "error"),
 		"%s",
 		"error: EOF",
 	}, {
-		Wrap(SkipPkgErr, io.EOF, "error"),
+		Wrap(0, io.EOF, "error"),
 		"%v",
 		"error: EOF",
 	}, {
-		Wrap(SkipPkgErr, io.EOF, "error"),
+		Wrap(0, io.EOF, "error"),
 		"%+v",
 		"EOF\n" +
 			"error\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWrap\n" +
 			"\t.+/nextf/errors/internal/pkgerr/format_test.go:96",
 	}, {
-		Wrap(SkipPkgErr, Wrap(SkipPkgErr, io.EOF, "error1"), "error2"),
+		Wrap(0, Wrap(0, io.EOF, "error1"), "error2"),
 		"%+v",
 		"EOF\n" +
 			"error1\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWrap\n" +
 			"\t.+/nextf/errors/internal/pkgerr/format_test.go:103\n",
 	}, {
-		Wrap(SkipPkgErr, New(SkipPkgErr, "error with space"), "context"),
+		Wrap(0, New(0, "error with space"), "context"),
 		"%q",
 		`"context: error with space"`,
 	}}
@@ -123,30 +123,30 @@ func TestFormatWrapf(t *testing.T) {
 		format string
 		want   string
 	}{{
-		Wrapf(SkipPkgErr, io.EOF, "error%d", 2),
+		Wrapf(0, io.EOF, "error%d", 2),
 		"%s",
 		"error2: EOF",
 	}, {
-		Wrapf(SkipPkgErr, io.EOF, "error%d", 2),
+		Wrapf(0, io.EOF, "error%d", 2),
 		"%v",
 		"error2: EOF",
 	}, {
-		Wrapf(SkipPkgErr, io.EOF, "error%d", 2),
+		Wrapf(0, io.EOF, "error%d", 2),
 		"%+v",
 		"EOF\n" +
 			"error2\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWrapf\n" +
 			"\t.+/nextf/errors/internal/pkgerr/format_test.go:134",
 	}, {
-		Wrapf(SkipPkgErr, New(SkipPkgErr, "error"), "error%d", 2),
+		Wrapf(0, New(0, "error"), "error%d", 2),
 		"%s",
 		"error2: error",
 	}, {
-		Wrapf(SkipPkgErr, New(SkipPkgErr, "error"), "error%d", 2),
+		Wrapf(0, New(0, "error"), "error%d", 2),
 		"%v",
 		"error2: error",
 	}, {
-		Wrapf(SkipPkgErr, New(SkipPkgErr, "error"), "error%d", 2),
+		Wrapf(0, New(0, "error"), "error%d", 2),
 		"%+v",
 		"error\n" +
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWrapf\n" +
@@ -164,29 +164,29 @@ func TestFormatWithStack(t *testing.T) {
 		format string
 		want   []string
 	}{{
-		WithStack(SkipPkgErr, io.EOF),
+		WithStack(0, io.EOF),
 		"%s",
 		[]string{"EOF"},
 	}, {
-		WithStack(SkipPkgErr, io.EOF),
+		WithStack(0, io.EOF),
 		"%v",
 		[]string{"EOF"},
 	}, {
-		WithStack(SkipPkgErr, io.EOF),
+		WithStack(0, io.EOF),
 		"%+v",
 		[]string{"EOF",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:175"},
 	}, {
-		WithStack(SkipPkgErr, New(SkipPkgErr, "error")),
+		WithStack(0, New(0, "error")),
 		"%s",
 		[]string{"error"},
 	}, {
-		WithStack(SkipPkgErr, New(SkipPkgErr, "error")),
+		WithStack(0, New(0, "error")),
 		"%v",
 		[]string{"error"},
 	}, {
-		WithStack(SkipPkgErr, New(SkipPkgErr, "error")),
+		WithStack(0, New(0, "error")),
 		"%+v",
 		[]string{"error",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
@@ -194,7 +194,7 @@ func TestFormatWithStack(t *testing.T) {
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:189"},
 	}, {
-		WithStack(SkipPkgErr, WithStack(SkipPkgErr, io.EOF)),
+		WithStack(0, WithStack(0, io.EOF)),
 		"%+v",
 		[]string{"EOF",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
@@ -202,7 +202,7 @@ func TestFormatWithStack(t *testing.T) {
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:197"},
 	}, {
-		WithStack(SkipPkgErr, WithStack(SkipPkgErr, Wrapf(SkipPkgErr, io.EOF, "message"))),
+		WithStack(0, WithStack(0, Wrapf(0, io.EOF, "message"))),
 		"%+v",
 		[]string{"EOF",
 			"message",
@@ -213,7 +213,7 @@ func TestFormatWithStack(t *testing.T) {
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:205"},
 	}, {
-		WithStack(SkipPkgErr, Errorf(SkipPkgErr, "error%d", 1)),
+		WithStack(0, Errorf(0, "error%d", 1)),
 		"%+v",
 		[]string{"error1",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithStack\n" +
@@ -233,15 +233,15 @@ func TestFormatWithMessage(t *testing.T) {
 		format string
 		want   []string
 	}{{
-		WithMessage(New(SkipPkgErr, "error"), "error2"),
+		WithMessage(New(0, "error"), "error2"),
 		"%s",
 		[]string{"error2: error"},
 	}, {
-		WithMessage(New(SkipPkgErr, "error"), "error2"),
+		WithMessage(New(0, "error"), "error2"),
 		"%v",
 		[]string{"error2: error"},
 	}, {
-		WithMessage(New(SkipPkgErr, "error"), "error2"),
+		WithMessage(New(0, "error"), "error2"),
 		"%+v",
 		[]string{
 			"error",
@@ -269,20 +269,20 @@ func TestFormatWithMessage(t *testing.T) {
 		"%+v",
 		[]string{"EOF", "addition1", "addition2"},
 	}, {
-		Wrap(SkipPkgErr, WithMessage(io.EOF, "error1"), "error2"),
+		Wrap(0, WithMessage(io.EOF, "error1"), "error2"),
 		"%+v",
 		[]string{"EOF", "error1", "error2",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithMessage\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:272"},
 	}, {
-		WithMessage(Errorf(SkipPkgErr, "error%d", 1), "error2"),
+		WithMessage(Errorf(0, "error%d", 1), "error2"),
 		"%+v",
 		[]string{"error1",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatWithMessage\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:278",
 			"error2"},
 	}, {
-		WithMessage(WithStack(SkipPkgErr, io.EOF), "error"),
+		WithMessage(WithStack(0, io.EOF), "error"),
 		"%+v",
 		[]string{
 			"EOF",
@@ -290,7 +290,7 @@ func TestFormatWithMessage(t *testing.T) {
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:285",
 			"error"},
 	}, {
-		WithMessage(Wrap(SkipPkgErr, WithStack(SkipPkgErr, io.EOF), "inside-error"), "outside-error"),
+		WithMessage(Wrap(0, WithStack(0, io.EOF), "inside-error"), "outside-error"),
 		"%+v",
 		[]string{
 			"EOF",
@@ -312,11 +312,11 @@ func TestFormatGeneric(t *testing.T) {
 		err  error
 		want []string
 	}{
-		{New(SkipPkgErr, "new-error"), []string{
+		{New(0, "new-error"), []string{
 			"new-error",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatGeneric\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:315"},
-		}, {Errorf(SkipPkgErr, "errorf-error"), []string{
+		}, {Errorf(0, "errorf-error"), []string{
 			"errorf-error",
 			"github.com/nextf/errors/internal/pkgerr.TestFormatGeneric\n" +
 				"\t.+/nextf/errors/internal/pkgerr/format_test.go:319"},
@@ -330,20 +330,20 @@ func TestFormatGeneric(t *testing.T) {
 			func(err error) error { return WithMessage(err, "with-message") },
 			[]string{"with-message"},
 		}, {
-			func(err error) error { return WithStack(SkipPkgErr, err) },
+			func(err error) error { return WithStack(0, err) },
 			[]string{
 				"github.com/nextf/errors/internal/pkgerr.(func·002|TestFormatGeneric.func2)\n\t" +
 					".+/nextf/errors/internal/pkgerr/format_test.go:333",
 			},
 		}, {
-			func(err error) error { return Wrap(SkipPkgErr, err, "wrap-error") },
+			func(err error) error { return Wrap(0, err, "wrap-error") },
 			[]string{
 				"wrap-error",
 				"github.com/nextf/errors/internal/pkgerr.(func·003|TestFormatGeneric.func3)\n\t" +
 					".+/nextf/errors/internal/pkgerr/format_test.go:339",
 			},
 		}, {
-			func(err error) error { return Wrapf(SkipPkgErr, err, "wrapf-error%d", 1) },
+			func(err error) error { return Wrapf(0, err, "wrapf-error%d", 1) },
 			[]string{
 				"wrapf-error1",
 				"github.com/nextf/errors/internal/pkgerr.(func·004|TestFormatGeneric.func4)\n\t" +
@@ -361,7 +361,7 @@ func TestFormatGeneric(t *testing.T) {
 }
 
 func wrappedNew(message string) error { // This function will be mid-stack inlined in go 1.12+
-	return New(SkipPkgErr, message)
+	return New(0, message)
 }
 
 func TestFormatWrappedNew(t *testing.T) {
