@@ -9,9 +9,9 @@ import (
 	"github.com/nextf/errors"
 )
 
-var ErrNotFoundPage = errors.CodErr("NOT_FOUND", "Not found page")
-var ErrNotFoundFile = errors.CodErr("NOT_FOUND", "Not found file")
-var ErrEndOfStream = errors.CodErr("EOF", "End of stream")
+var ErrNotFoundPage = errors.ErrCode("NOT_FOUND", "Not found page")
+var ErrNotFoundFile = errors.ErrCode("NOT_FOUND", "Not found file")
+var ErrEndOfStream = errors.ErrCode("EOF", "End of stream")
 
 func TestAs(t *testing.T) {
 	e1 := errors.Wrap(ErrNotFoundPage, "Not found index.html")
@@ -51,14 +51,14 @@ func TestFormat(t *testing.T) {
 
 	e1 := errors.Wrap(ErrNotFoundPage, "Not found index.html")
 	withStack := fmt.Sprintf("%+v", e1)
-	logPrefix := "[NOT_FOUND] Not found page\nNot found index.html\ngithub.com/nextf/errors.WithStack"
+	logPrefix := "[NOT_FOUND] Not found page\nNot found index.html\ngithub.com/nextf/errors.Wrap"
 	if !strings.HasPrefix(withStack, logPrefix) {
 		t.Error("Unprinted stack.")
 	}
 }
 
 func TestWithStack(t *testing.T) {
-	err := errors.CodErr("ROOT", "Level 0")
+	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.WithStack(err)
@@ -83,7 +83,7 @@ func TestWithStack(t *testing.T) {
 }
 
 func TestWrap(t *testing.T) {
-	err := errors.CodErr("ROOT", "Level 0")
+	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.Wrap(err, fmt.Sprintf("Level %d", i))
@@ -108,7 +108,7 @@ func TestWrap(t *testing.T) {
 }
 
 func TestWrapf(t *testing.T) {
-	err := errors.CodErr("ROOT", "Level 0")
+	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.Wrapf(err, "Level %d", i)
