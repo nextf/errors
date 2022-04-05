@@ -1,4 +1,4 @@
-package test
+package errors_test
 
 import (
 	"fmt"
@@ -51,7 +51,7 @@ func TestFormat(t *testing.T) {
 
 	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
 	withStack := fmt.Sprintf("%+v", e1)
-	logPrefix := "[NOT_FOUND] Not found page\nNot found index.html\ngithub.com/nextf/errors/test.TestFormat\n"
+	logPrefix := "[NOT_FOUND] Not found page\nNot found index.html\ngithub.com/nextf/errors_test.TestFormat\n"
 	if !strings.HasPrefix(withStack, logPrefix) {
 		t.Error("Unprinted stack.")
 	}
