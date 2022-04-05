@@ -8,7 +8,7 @@ import (
 type withErrCode struct {
 	code    string
 	message string
-	error
+	cause   error
 }
 
 func (c *withErrCode) Error() string {
@@ -37,25 +37,10 @@ func (c *withErrCode) Match(key interface{}) bool {
 func (c *withErrCode) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
-		fmt.Fprintf(s, "[%s] %s", c.Code(), c.Error())
+		fmt.Fprintf(s, "[%s] %s", c.code, c.message)
 	case 's':
 		io.WriteString(s, c.message)
 	case 'q':
 		fmt.Fprintf(s, "%q", c.message)
 	}
-}
-
-func NewErrCode(code string, message string) error {
-	return &withErrCode{code, message, nil}
-}
-
-func NewErrCodeWithStack(code string, message string) error {
-	return withStackIfAbsent(1, &withErrCode{code, message, nil})
-}
-
-func WrapErrCode(code string, message string, cause error) error {
-	if cause == nil {
-		return nil
-	}
-	return &withErrCode{code, message, withStackIfAbsent(1, cause)}
 }

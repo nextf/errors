@@ -9,12 +9,12 @@ import (
 	"github.com/nextf/errors"
 )
 
-var ErrNotFoundPage = errors.NewErrCode("NOT_FOUND", "Not found page")
-var ErrNotFoundFile = errors.NewErrCode("NOT_FOUND", "Not found file")
-var ErrEndOfStream = errors.NewErrCode("EOF", "End of stream")
+var ErrNotFoundPage = errors.ErrCode("NOT_FOUND", "Not found page")
+var ErrNotFoundFile = errors.ErrCode("NOT_FOUND", "Not found file")
+var ErrEndOfStream = errors.ErrCode("EOF", "End of stream")
 
 func TestAs(t *testing.T) {
-	e1 := errors.Wrap(ErrNotFoundPage, "Not found index.html")
+	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
 	var coder interface{ Code() string }
 	if errors.As(e1, &coder) {
 		if coder.Code() != "NOT_FOUND" {
@@ -26,7 +26,7 @@ func TestAs(t *testing.T) {
 }
 
 func TestMatch(t *testing.T) {
-	e1 := errors.Wrap(ErrNotFoundPage, "Not found index.html")
+	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
 	if !errors.Match(e1, "NOT_FOUND") {
 		t.Errorf("Expect %v, got %v", "code=NOT_FOUND", "[NotMatch]")
 	}
@@ -49,7 +49,7 @@ func TestFormat(t *testing.T) {
 		t.Errorf("Expect %+v, got %+v", "Not found page", ErrNotFoundPage)
 	}
 
-	e1 := errors.Wrap(ErrNotFoundPage, "Not found index.html")
+	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
 	withStack := fmt.Sprintf("%+v", e1)
 	logPrefix := "[NOT_FOUND] Not found page\nNot found index.html\ngithub.com/nextf/errors/test.TestFormat\n"
 	if !strings.HasPrefix(withStack, logPrefix) {
@@ -58,7 +58,7 @@ func TestFormat(t *testing.T) {
 }
 
 func TestWithStack(t *testing.T) {
-	err := errors.NewErrCode("ROOT", "Level 0")
+	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.WithStack(err)
@@ -83,10 +83,10 @@ func TestWithStack(t *testing.T) {
 }
 
 func TestWrap(t *testing.T) {
-	err := errors.NewErrCode("ROOT", "Level 0")
+	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
-		err = errors.Wrap(err, fmt.Sprintf("Level %d", i))
+		err = errors.WithMessage(err, fmt.Sprintf("Level %d", i))
 	}
 	counter := 0
 	level := 0
@@ -108,10 +108,10 @@ func TestWrap(t *testing.T) {
 }
 
 func TestWrapf(t *testing.T) {
-	err := errors.NewErrCode("ROOT", "Level 0")
+	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
-		err = errors.Wrapf(err, "Level %d", i)
+		err = errors.WithMessagef(err, "Level %d", i)
 	}
 	counter := 0
 	level := 0

@@ -25,18 +25,21 @@ var (
 	// WithMessage is a function that annotates err with a new message.
 	// If err is nil, WithMessage returns nil.
 	// func WithMessage(err error, message string) error
-	WithMessage = pkgerr.WithMessage
+	// WithMessage = pkgerr.WithMessage
 
 	// Convergent the functions of pkg/errors library
 	// WithMessagef is a function that annotates err with the format specifier.
 	// If err is nil, WithMessagef returns nil.
 	// func WithMessagef(err error, format string, args ...interface{}) error
-	WithMessagef = pkgerr.WithMessagef
+	// WithMessagef = pkgerr.WithMessagef
 )
 
 type StackTrace = pkgerr.StackTrace
 
 func Match(err error, key interface{}) bool {
+	if err == nil {
+		return false
+	}
 	for {
 		if x, ok := err.(interface{ Match(interface{}) bool }); ok && x.Match(key) {
 			return true
@@ -48,6 +51,9 @@ func Match(err error, key interface{}) bool {
 }
 
 func GetCode(err error) (string, bool) {
+	if err == nil {
+		return "", false
+	}
 	for {
 		if x, ok := err.(interface{ Code() string }); ok {
 			return x.Code(), true
@@ -56,6 +62,31 @@ func GetCode(err error) (string, bool) {
 			return "", false
 		}
 	}
+}
+
+func ErrCode(code, message string) error {
+	return &withErrCode{code, message, nil}
+}
+
+func ErrCodeWithStack(code, message string) error {
+	return pkgerr.WithStack(1, &withErrCode{code, message, nil})
+}
+
+func WithErrCode(code, message string, cause error) error {
+	if cause == nil {
+		return nil
+	}
+	return withStackIfAbsent(1, &withErrCode{code, message, cause})
+}
+
+func WithErrCodeIfAbsent(code, message string, cause error) error {
+	if cause == nil {
+		return nil
+	}
+	if _, ok := GetCode(cause); ok {
+		return withStackIfAbsent(1, cause)
+	}
+	return withStackIfAbsent(1, &withErrCode{code, message, cause})
 }
 
 func HasStackTrace(err error) bool {
@@ -93,21 +124,25 @@ func WithStack(err error) error {
 }
 
 // var Wrap = pkgerr.Wrap
-func Wrap(err error, message string) error {
-	return withStackIfAbsent(1, WithMessage(err, message))
+func WithMessage(err error, message string) error {
+	return withStackIfAbsent(1, pkgerr.WithMessage(err, message))
 }
 
 // var Wrapf = pkgerr.Wrapf
-func Wrapf(err error, format string, args ...interface{}) error {
-	return withStackIfAbsent(1, WithMessage(err, fmt.Sprintf(format, args...)))
+func WithMessagef(err error, format string, args ...interface{}) error {
+	return withStackIfAbsent(1, pkgerr.WithMessagef(err, format, args...))
 }
 
-// var Errorf = pkgerr.Errorf
+// var Errorf = fmt.Errorf
 func Errorf(format string, args ...interface{}) error {
-	return pkgerr.Errorf(1, format, args...)
+	return fmt.Errorf(format, args...)
 }
 
-// var NewWithStack = pkgerr.New
-func NewWithStack(message string) error {
+// var Stack = pkgerr.New
+func Stack(message string) error {
 	return pkgerr.New(1, message)
+}
+
+func Stackf(format string, args ...interface{}) error {
+	return pkgerr.Errorf(1, format, args...)
 }

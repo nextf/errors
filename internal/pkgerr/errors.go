@@ -170,7 +170,8 @@ func (w *withStack) Format(s fmt.State, verb rune) {
 			w.stack.Format(s, verb)
 			return
 		}
-		fallthrough
+		// fallthrough
+		fmt.Fprintf(s, "%v", w.Cause())
 	case 's':
 		io.WriteString(s, w.Error())
 	case 'q':
