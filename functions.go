@@ -119,11 +119,6 @@ func WithMessagef(err error, format string, args ...interface{}) error {
 	return withStackIfAbsent(1, pkgerr.WithMessagef(err, format, args...))
 }
 
-// var Errorf = fmt.Errorf
-func Errorf(format string, args ...interface{}) error {
-	return fmt.Errorf(format, args...)
-}
-
 // var Stack = pkgerr.New
 func Stack(message string) error {
 	return pkgerr.New(1, message)
@@ -131,4 +126,14 @@ func Stack(message string) error {
 
 func Stackf(format string, args ...interface{}) error {
 	return pkgerr.Errorf(1, format, args...)
+}
+
+// var Message = stderr.New
+func Message(message string) error {
+	return stderr.New(message)
+}
+
+// var Messagef = fmt.Errorf
+func Messagef(format string, args ...interface{}) error {
+	return fmt.Errorf(format, args...)
 }
