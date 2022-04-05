@@ -82,7 +82,7 @@ func TestWithStack(t *testing.T) {
 	}
 }
 
-func TestWrap(t *testing.T) {
+func TestWithMessage(t *testing.T) {
 	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
@@ -107,7 +107,7 @@ func TestWrap(t *testing.T) {
 	}
 }
 
-func TestWrapf(t *testing.T) {
+func TestWithMessagef(t *testing.T) {
 	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
