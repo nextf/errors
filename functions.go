@@ -8,33 +8,19 @@ import (
 	"github.com/nextf/errors/internal/pkgerr"
 )
 
-var (
-	// Convergent the functions of standard library
-	// func Is(err, target error) bool
-	Is = stderr.Is
-
-	// Convergent the functions of standard library
-	// func As(err error, target interface{}) bool
-	As = stderr.As
-
-	// Convergent the functions of standard library
-	// func Unwrap(err error) error
-	Unwrap = stderr.Unwrap
-
-	// Convergent the functions of pkg/errors library
-	// WithMessage is a function that annotates err with a new message.
-	// If err is nil, WithMessage returns nil.
-	// func WithMessage(err error, message string) error
-	// WithMessage = pkgerr.WithMessage
-
-	// Convergent the functions of pkg/errors library
-	// WithMessagef is a function that annotates err with the format specifier.
-	// If err is nil, WithMessagef returns nil.
-	// func WithMessagef(err error, format string, args ...interface{}) error
-	// WithMessagef = pkgerr.WithMessagef
-)
-
 type StackTrace = pkgerr.StackTrace
+
+func Is(err, target error) bool {
+	return stderr.Is(err, target)
+}
+
+func As(err error, target interface{}) bool {
+	return stderr.As(err, target)
+}
+
+func Unwrap(err error) error {
+	return stderr.Unwrap(err)
+}
 
 func Match(err error, key interface{}) bool {
 	if err == nil {
