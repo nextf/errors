@@ -9,9 +9,9 @@ import (
 	"github.com/nextf/errors"
 )
 
-var ErrNotFoundPage = errors.ErrCode("NOT_FOUND", "Not found page")
-var ErrNotFoundFile = errors.ErrCode("NOT_FOUND", "Not found file")
-var ErrEndOfStream = errors.ErrCode("EOF", "End of stream")
+var ErrNotFoundPage = errors.New("NOT_FOUND", "Not found page")
+var ErrNotFoundFile = errors.New("NOT_FOUND", "Not found file")
+var ErrEndOfStream = errors.New("EOF", "End of stream")
 
 func TestAs(t *testing.T) {
 	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
@@ -58,7 +58,7 @@ func TestFormat(t *testing.T) {
 }
 
 func TestWithStack(t *testing.T) {
-	err := errors.ErrCode("ROOT", "Level 0")
+	err := errors.New("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.WithStack(err)
@@ -83,7 +83,7 @@ func TestWithStack(t *testing.T) {
 }
 
 func TestWithMessage(t *testing.T) {
-	err := errors.ErrCode("ROOT", "Level 0")
+	err := errors.New("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.WithMessage(err, fmt.Sprintf("Level %d", i))
@@ -108,7 +108,7 @@ func TestWithMessage(t *testing.T) {
 }
 
 func TestWithMessagef(t *testing.T) {
-	err := errors.ErrCode("ROOT", "Level 0")
+	err := errors.New("ROOT", "Level 0")
 	times := 10
 	for i := 1; i < times; i++ {
 		err = errors.WithMessagef(err, "Level %d", i)

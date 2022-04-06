@@ -50,29 +50,37 @@ func GetCode(err error) (string, bool) {
 	}
 }
 
-func ErrCode(code, message string) error {
+func New(code, message string) error {
 	return &withErrCode{code, message, nil}
 }
 
-func ErrCodeWithStack(code, message string) error {
+func Newf(code, format string, args ...interface{}) error {
+	return &withErrCode{code, fmt.Sprintf(format, args...), nil}
+}
+
+func NewWithStack(code, message string) error {
 	return pkgerr.WithStack(1, &withErrCode{code, message, nil})
 }
 
-func WithErrCode(code, message string, cause error) error {
-	if cause == nil {
-		return nil
-	}
-	return withStackIfAbsent(1, &withErrCode{code, message, cause})
+func NewWithStackf(code, format string, args ...interface{}) error {
+	return pkgerr.WithStack(1, &withErrCode{code, fmt.Sprintf(format, args...), nil})
 }
 
-func WithErrCodeIfAbsent(code, message string, cause error) error {
+func WithCode(cause error, code, message string) error {
 	if cause == nil {
 		return nil
 	}
 	if _, ok := GetCode(cause); ok {
-		return withStackIfAbsent(1, cause)
+		return cause
 	}
-	return withStackIfAbsent(1, &withErrCode{code, message, cause})
+	return &withErrCode{code, message, cause}
+}
+
+func WithCodeMass(cause error, code, message string) error {
+	if cause == nil {
+		return nil
+	}
+	return &withErrCode{code, message, cause}
 }
 
 func HasStackTrace(err error) bool {
@@ -98,42 +106,70 @@ func withStackIfAbsent(skipCounter int, err error) error {
 }
 
 // var WithStack = pkgerr.WithStack
-func WithStack(err error) error {
-	if err == nil {
+func WithStack(cause error) error {
+	if cause == nil {
 		return nil
 	}
-	if HasStackTrace(err) {
-		return err
-	} else {
-		return withStackIfAbsent(1, err)
+	return withStackIfAbsent(1, cause)
+}
+
+func WithStackMass(cause error) error {
+	if cause == nil {
+		return nil
 	}
+	return pkgerr.WithStack(1, cause)
 }
 
-// var Wrap = pkgerr.Wrap
-func WithMessage(err error, message string) error {
-	return withStackIfAbsent(1, pkgerr.WithMessage(err, message))
+func Wrap(cause error, code, message string) error {
+	if cause == nil {
+		return nil
+	}
+	if _, ok := GetCode(cause); ok {
+		return withStackIfAbsent(1, cause)
+	}
+	return withStackIfAbsent(1, &withErrCode{code, message, cause})
 }
 
-// var Wrapf = pkgerr.Wrapf
-func WithMessagef(err error, format string, args ...interface{}) error {
-	return withStackIfAbsent(1, pkgerr.WithMessagef(err, format, args...))
+func Wrapf(cause error, code, format string, args ...interface{}) error {
+	if cause == nil {
+		return nil
+	}
+	if _, ok := GetCode(cause); ok {
+		return withStackIfAbsent(1, cause)
+	}
+	return withStackIfAbsent(1, &withErrCode{code, fmt.Sprintf(format, args...), cause})
 }
 
-// var Stack = pkgerr.New
-func Stack(message string) error {
-	return pkgerr.New(1, message)
+func WrapMass(cause error, code, message string) error {
+	if cause == nil {
+		return nil
+	}
+	return pkgerr.WithStack(1, &withErrCode{code, message, cause})
 }
 
-func Stackf(format string, args ...interface{}) error {
-	return pkgerr.Errorf(1, format, args...)
+func WrapMassf(cause error, code, format string, args ...interface{}) error {
+	if cause == nil {
+		return nil
+	}
+	return pkgerr.WithStack(1, &withErrCode{code, fmt.Sprintf(format, args...), cause})
 }
 
-// var Message = stderr.New
+// Deprecated: Too simple. Use errors.New instead.
 func Message(message string) error {
 	return stderr.New(message)
 }
 
-// var Messagef = fmt.Errorf
+// Deprecated: Too simple. Use errors.New instead.
 func Messagef(format string, args ...interface{}) error {
 	return fmt.Errorf(format, args...)
+}
+
+// Deprecated: Too simple. Use errors.Wrap instead.
+func WithMessage(err error, message string) error {
+	return withStackIfAbsent(1, pkgerr.WithMessage(err, message))
+}
+
+// Deprecated: Too simple. Use errors.Wrapf instead.
+func WithMessagef(err error, format string, args ...interface{}) error {
+	return withStackIfAbsent(1, pkgerr.WithMessagef(err, format, args...))
 }
