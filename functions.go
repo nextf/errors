@@ -159,7 +159,7 @@ func Message(message string) error {
 	return stderr.New(message)
 }
 
-// Deprecated: Too simple. Use errors.New instead.
+// Deprecated: Too simple. Use errors.Newf instead.
 func Messagef(format string, args ...interface{}) error {
 	return fmt.Errorf(format, args...)
 }
