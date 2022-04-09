@@ -26,6 +26,10 @@ func (c *withErrCode) Match(key interface{}) bool {
 	return false
 }
 
+func (c *withErrCode) Unwrap() error {
+	return c.cause
+}
+
 // func (ce *codedError) Is(err error) bool {
 // 	var coder interface{ Code() string }
 // 	if As(err, &coder) {
