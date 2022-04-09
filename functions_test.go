@@ -55,6 +55,12 @@ func TestErrCodeFormat(t *testing.T) {
 	if !strings.HasPrefix(withStack, logPrefix) {
 		t.Error("Unprinted stack.")
 	}
+	e2 := errors.WithCode(errors.Message("Not found file"), "NOT_FOUND", "Not found index.html")
+	withCode := fmt.Sprintf("%+v", e2)
+	logText := "[NOT_FOUND] Not found index.html\nCaused by: Not found file"
+	if withCode != logText {
+		t.Errorf("Expected message was not obtained\n%s", withCode)
+	}
 }
 
 func TestWithStack(t *testing.T) {
