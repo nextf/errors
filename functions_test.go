@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/nextf/errors"
+	"github.com/nextf/errors/stack"
 )
 
 var ErrNotFoundPage = errors.New("NOT_FOUND", "Not found page")
@@ -51,7 +52,7 @@ func TestErrCodeFormat(t *testing.T) {
 
 	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
 	withStack := fmt.Sprintf("%+v", e1)
-	logPrefix := "[NOT_FOUND] Not found page\nNot found index.html\ngithub.com/nextf/errors_test.TestErrCodeFormat\n"
+	logPrefix := "Not found index.html\nCaused by: @callstack\ngithub.com/nextf/errors_test.TestErrCodeFormat(functions_test.go:53)"
 	if !strings.HasPrefix(withStack, logPrefix) {
 		t.Error("Unprinted stack.")
 	}
@@ -72,7 +73,7 @@ func TestWithStack(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
-		if _, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
@@ -97,7 +98,7 @@ func TestWithMessage(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
-		if _, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
@@ -122,7 +123,7 @@ func TestWithMessagef(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
-		if _, ok := err.(interface{ StackTrace() errors.StackTrace }); ok {
+		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
@@ -140,7 +141,7 @@ func TestWithMessagef(t *testing.T) {
 
 func TestNew(t *testing.T) {
 	err := errors.New("NEW_IN_FUNC", "error for unittest")
-	if errors.HasStackTrace(err) {
+	if errors.HasErrorStack(err) {
 		t.Errorf("It was expected that there would be no StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -153,7 +154,7 @@ func TestNew(t *testing.T) {
 
 func TestNewWithStack(t *testing.T) {
 	err := errors.NewWithStack("NEW_IN_FUNC", "error for unittest")
-	if !errors.HasStackTrace(err) {
+	if !errors.HasErrorStack(err) {
 		t.Errorf("It was expected that there would has StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -167,7 +168,7 @@ func TestNewWithStack(t *testing.T) {
 func TestNewf(t *testing.T) {
 	num := rand.Int()
 	err := errors.Newf("NEW_IN_FUNC", "Wrong number [%d]", num)
-	if errors.HasStackTrace(err) {
+	if errors.HasErrorStack(err) {
 		t.Errorf("It was expected that there would be no StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -181,7 +182,7 @@ func TestNewf(t *testing.T) {
 func TestNewWithStackf(t *testing.T) {
 	num := rand.Int()
 	err := errors.NewWithStackf("NEW_IN_FUNC", "Wrong number [%d]", num)
-	if !errors.HasStackTrace(err) {
+	if !errors.HasErrorStack(err) {
 		t.Errorf("It was expected that there would has StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -203,7 +204,7 @@ func TestWrap_1(t *testing.T) {
 	level := 0
 	errTmp := err
 	for {
-		if _, ok := errTmp.(interface{ StackTrace() errors.StackTrace }); ok {
+		if _, ok := errTmp.(interface{ CallersFrames() []stack.Frame }); ok {
 			stackCounter++
 		}
 		if _, ok := errTmp.(interface{ Code() string }); ok {
@@ -236,7 +237,7 @@ func TestWrap_2(t *testing.T) {
 	level := 0
 	errTmp := err
 	for {
-		if _, ok := errTmp.(interface{ StackTrace() errors.StackTrace }); ok {
+		if _, ok := errTmp.(interface{ CallersFrames() []stack.Frame }); ok {
 			stackCounter++
 		}
 		if _, ok := errTmp.(interface{ Code() string }); ok {

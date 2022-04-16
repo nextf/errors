@@ -5,10 +5,8 @@ import (
 	stderr "errors"
 	"fmt"
 
-	"github.com/nextf/errors/internal/pkgerr"
+	"github.com/nextf/errors/stack"
 )
-
-type StackTrace = pkgerr.StackTrace
 
 func Is(err, target error) bool {
 	return stderr.Is(err, target)
@@ -59,11 +57,11 @@ func Newf(code, format string, args ...interface{}) error {
 }
 
 func NewWithStack(code, message string) error {
-	return pkgerr.WithStack(1, &withErrCode{code, message, nil})
+	return &withErrCode{code, message, newErrorStack(1)}
 }
 
 func NewWithStackf(code, format string, args ...interface{}) error {
-	return pkgerr.WithStack(1, &withErrCode{code, fmt.Sprintf(format, args...), nil})
+	return &withErrCode{code, fmt.Sprintf(format, args...), newErrorStack(1)}
 }
 
 func WithCode(cause error, code, message string) error {
@@ -76,19 +74,19 @@ func WithCode(cause error, code, message string) error {
 	return &withErrCode{code, message, cause}
 }
 
-func WithCodeMass(cause error, code, message string) error {
+func WithCodePile(cause error, code, message string) error {
 	if cause == nil {
 		return nil
 	}
 	return &withErrCode{code, message, cause}
 }
 
-func HasStackTrace(err error) bool {
+func HasErrorStack(err error) bool {
 	if err == nil {
 		return false
 	}
 	for {
-		if _, ok := err.(interface{ StackTrace() StackTrace }); ok {
+		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
 			return true
 		}
 		if err = Unwrap(err); err == nil {
@@ -97,11 +95,11 @@ func HasStackTrace(err error) bool {
 	}
 }
 
-func withStackIfAbsent(skipCounter int, err error) error {
-	if HasStackTrace(err) {
+func withStackIfAbsent(skip int, err error) error {
+	if HasErrorStack(err) {
 		return err
 	} else {
-		return pkgerr.WithStack(skipCounter+1, err)
+		return withErrorStack(err, skip+1)
 	}
 }
 
@@ -113,45 +111,47 @@ func WithStack(cause error) error {
 	return withStackIfAbsent(1, cause)
 }
 
-func WithStackMass(cause error) error {
-	if cause == nil {
+func WithStackPile(err error) error {
+	if err == nil {
 		return nil
 	}
-	return pkgerr.WithStack(1, cause)
+	return withErrorStack(err, 1)
 }
 
-func Wrap(cause error, code, message string) error {
-	if cause == nil {
+func Wrap(err error, code, message string) error {
+	if err == nil {
 		return nil
 	}
-	if _, ok := GetCode(cause); ok {
-		return withStackIfAbsent(1, cause)
+	err = withStackIfAbsent(1, err)
+	if _, ok := GetCode(err); !ok {
+		err = &withErrCode{code, message, err}
 	}
-	return withStackIfAbsent(1, &withErrCode{code, message, cause})
+	return err
 }
 
-func Wrapf(cause error, code, format string, args ...interface{}) error {
-	if cause == nil {
+func Wrapf(err error, code, format string, args ...interface{}) error {
+	if err == nil {
 		return nil
 	}
-	if _, ok := GetCode(cause); ok {
-		return withStackIfAbsent(1, cause)
+	err = withStackIfAbsent(1, err)
+	if _, ok := GetCode(err); !ok {
+		err = &withErrCode{code, fmt.Sprintf(format, args...), err}
 	}
-	return withStackIfAbsent(1, &withErrCode{code, fmt.Sprintf(format, args...), cause})
+	return err
 }
 
-func WrapMass(cause error, code, message string) error {
-	if cause == nil {
+func WrapPile(err error, code, message string) error {
+	if err == nil {
 		return nil
 	}
-	return pkgerr.WithStack(1, &withErrCode{code, message, cause})
+	return &withErrCode{code, message, withErrorStack(err, 1)}
 }
 
-func WrapMassf(cause error, code, format string, args ...interface{}) error {
-	if cause == nil {
+func WrapPilef(err error, code, format string, args ...interface{}) error {
+	if err == nil {
 		return nil
 	}
-	return pkgerr.WithStack(1, &withErrCode{code, fmt.Sprintf(format, args...), cause})
+	return &withErrCode{code, fmt.Sprintf(format, args...), withErrorStack(err, 1)}
 }
 
 // Deprecated: Too simple. Use errors.New instead.
@@ -166,10 +166,10 @@ func Messagef(format string, args ...interface{}) error {
 
 // Deprecated: Too simple. Use errors.Wrap instead.
 func WithMessage(err error, message string) error {
-	return withStackIfAbsent(1, pkgerr.WithMessage(err, message))
+	return &withMessage{message, withStackIfAbsent(1, err)}
 }
 
 // Deprecated: Too simple. Use errors.Wrapf instead.
 func WithMessagef(err error, format string, args ...interface{}) error {
-	return withStackIfAbsent(1, pkgerr.WithMessagef(err, format, args...))
+	return &withMessage{fmt.Sprintf(format, args...), withStackIfAbsent(1, err)}
 }
