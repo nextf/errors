@@ -43,16 +43,6 @@ func (s CallStack) StackTrace() []Frame {
 	return buff
 }
 
-func (s *CallStack) Format(st fmt.State, verb rune) {
-	switch verb {
-	case 'v':
-		switch {
-		case st.Flag('+'):
-			fmt.Fprintf(st, "%s", s.String())
-		}
-	}
-}
-
 func (f Frame) String() string {
 	_, file := path.Split(f.File)
 	return fmt.Sprintf("%s(%s:%d)", f.Function, file, f.Line)

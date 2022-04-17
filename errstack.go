@@ -2,6 +2,8 @@ package errors
 
 import (
 	"fmt"
+	"io"
+	"strings"
 
 	"github.com/nextf/errors/stack"
 )
@@ -30,7 +32,9 @@ func (c *errorStack) Unwrap() error {
 func (c *errorStack) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
-		fmt.Fprintf(s, "@callstack\n%v", c.stack)
+		// pretty print for log
+		stacklog := strings.ReplaceAll(fmt.Sprintf("@callstack\n%v", c.stack), "\n", "\n\x20\x20\x20\x20")
+		io.WriteString(s, stacklog)
 		if s.Flag('+') && c.cause != nil {
 			fmt.Fprintf(s, "\nCaused by: %+v", c.cause)
 		}

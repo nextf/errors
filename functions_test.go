@@ -52,7 +52,7 @@ func TestErrCodeFormat(t *testing.T) {
 
 	e1 := errors.WithMessage(ErrNotFoundPage, "Not found index.html")
 	withStack := fmt.Sprintf("%+v", e1)
-	logPrefix := "Not found index.html\nCaused by: @callstack\ngithub.com/nextf/errors_test.TestErrCodeFormat(functions_test.go:53)"
+	logPrefix := "Not found index.html\nCaused by: @callstack\n\x20\x20\x20\x20github.com/nextf/errors_test.TestErrCodeFormat(functions_test.go:53)"
 	if !strings.HasPrefix(withStack, logPrefix) {
 		t.Error("Unprinted stack.")
 	}
