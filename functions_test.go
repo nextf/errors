@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"math/rand"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -33,6 +34,15 @@ func TestMatch(t *testing.T) {
 	}
 	if errors.Match(e1, "CODE0001") {
 		t.Errorf("Expect %v, got %v", "code=NOT_FOUND", "CODE0001")
+	}
+	if errors.Match(e1, []byte("NOT_FOUND")) {
+		t.Errorf("Expect %v, got %v", "code=NOT_FOUND", []byte("NOT_FOUND"))
+	}
+	if !errors.Match(e1, regexp.MustCompile("^NOT.*$")) {
+		t.Errorf("Expect %v, got %v", "code~=^NOT.*$", "[NotMatch]")
+	}
+	if errors.Match(e1, regexp.MustCompile("^YES.*$")) {
+		t.Errorf("Expect %v, got %v", "code~=^NOT.*$", "[NotMatch]")
 	}
 }
 
