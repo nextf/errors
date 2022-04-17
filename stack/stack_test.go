@@ -11,7 +11,7 @@ func loopCall(time uint) stack.CallStack {
 		time--
 		return loopCall(time)
 	}
-	return stack.NewCallStack(0, 5)
+	return stack.RecordCallStack(0, 5)
 }
 
 func ExampleNewErrorStack() {

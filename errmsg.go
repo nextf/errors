@@ -5,20 +5,20 @@ import (
 	"io"
 )
 
-type withMessage struct {
+type errorMessage struct {
 	message string
 	cause   error
 }
 
-func (c *withMessage) Error() string {
+func (c *errorMessage) Error() string {
 	return c.message
 }
 
-func (c *withMessage) Unwrap() error {
+func (c *errorMessage) Unwrap() error {
 	return c.cause
 }
 
-func (c *withMessage) Format(s fmt.State, verb rune) {
+func (c *errorMessage) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
 		io.WriteString(s, c.message)

@@ -86,7 +86,7 @@ func HasErrorStack(err error) bool {
 		return false
 	}
 	for {
-		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
+		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			return true
 		}
 		if err = Unwrap(err); err == nil {
@@ -166,10 +166,10 @@ func Messagef(format string, args ...interface{}) error {
 
 // Deprecated: Too simple. Use errors.Wrap instead.
 func WithMessage(err error, message string) error {
-	return &withMessage{message, withStackIfAbsent(1, err)}
+	return &errorMessage{message, withStackIfAbsent(1, err)}
 }
 
 // Deprecated: Too simple. Use errors.Wrapf instead.
 func WithMessagef(err error, format string, args ...interface{}) error {
-	return &withMessage{fmt.Sprintf(format, args...), withStackIfAbsent(1, err)}
+	return &errorMessage{fmt.Sprintf(format, args...), withStackIfAbsent(1, err)}
 }

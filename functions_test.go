@@ -73,7 +73,7 @@ func TestWithStack(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
-		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
+		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
@@ -98,7 +98,7 @@ func TestWithMessage(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
-		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
+		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
@@ -123,7 +123,7 @@ func TestWithMessagef(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
-		if _, ok := err.(interface{ CallersFrames() []stack.Frame }); ok {
+		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
@@ -204,7 +204,7 @@ func TestWrap_1(t *testing.T) {
 	level := 0
 	errTmp := err
 	for {
-		if _, ok := errTmp.(interface{ CallersFrames() []stack.Frame }); ok {
+		if _, ok := errTmp.(interface{ StackTrace() []stack.Frame }); ok {
 			stackCounter++
 		}
 		if _, ok := errTmp.(interface{ Code() string }); ok {
@@ -237,7 +237,7 @@ func TestWrap_2(t *testing.T) {
 	level := 0
 	errTmp := err
 	for {
-		if _, ok := errTmp.(interface{ CallersFrames() []stack.Frame }); ok {
+		if _, ok := errTmp.(interface{ StackTrace() []stack.Frame }); ok {
 			stackCounter++
 		}
 		if _, ok := errTmp.(interface{ Code() string }); ok {

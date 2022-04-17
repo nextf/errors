@@ -15,8 +15,8 @@ type errorStack struct {
 	cause error
 }
 
-func (c *errorStack) CallersFrames() []stack.Frame {
-	return c.stack.CallersFrames()
+func (c *errorStack) StackTrace() []stack.Frame {
+	return c.stack.StackTrace()
 }
 
 func (c *errorStack) Error() string {
@@ -38,9 +38,9 @@ func (c *errorStack) Format(s fmt.State, verb rune) {
 }
 
 func newErrorStack(skip int) error {
-	return &errorStack{stack.NewCallStack(skip+1, maxDepth), nil}
+	return &errorStack{stack.RecordCallStack(skip+1, maxDepth), nil}
 }
 
 func withErrorStack(err error, skip int) error {
-	return &errorStack{stack.NewCallStack(skip+1, maxDepth), err}
+	return &errorStack{stack.RecordCallStack(skip+1, maxDepth), err}
 }
