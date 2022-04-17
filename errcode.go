@@ -33,14 +33,6 @@ func (c *withErrCode) Unwrap() error {
 	return c.cause
 }
 
-// func (ce *codedError) Is(err error) bool {
-// 	var coder interface{ Code() string }
-// 	if As(err, &coder) {
-// 		return ce.Code() == coder.Code()
-// 	}
-// 	return false
-// }
-
 func (c *withErrCode) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
