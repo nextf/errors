@@ -32,11 +32,26 @@ func (c *errorStack) Unwrap() error {
 func (c *errorStack) Format(s fmt.State, verb rune) {
 	switch verb {
 	case 'v':
+		if s.Flag('-') {
+			// Skip trace information
+			if c.cause != nil {
+				fmt.Fprintf(s, "%-v", c.cause)
+			}
+			break
+		}
 		// pretty print for log
 		stacklog := strings.ReplaceAll(fmt.Sprintf("@callstack\n%v", c.stack), "\n", "\n\x20\x20\x20\x20")
 		io.WriteString(s, stacklog)
 		if s.Flag('+') && c.cause != nil {
 			fmt.Fprintf(s, "\nCaused by: %+v", c.cause)
+		}
+	case 's':
+		if c.cause != nil {
+			fmt.Fprintf(s, "%s", c.cause)
+		}
+	case 'q':
+		if c.cause != nil {
+			fmt.Fprintf(s, "%q", c.cause)
 		}
 	}
 }

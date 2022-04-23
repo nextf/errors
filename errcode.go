@@ -20,6 +20,9 @@ func (c *withErrCode) Code() string {
 }
 
 func (c *withErrCode) Match(key interface{}) bool {
+	if key == nil {
+		return false
+	}
 	switch x := key.(type) {
 	case string:
 		return c.code == x

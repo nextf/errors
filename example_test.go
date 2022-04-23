@@ -8,14 +8,14 @@ import (
 )
 
 func ExampleNew() {
-	err := errors.New("ERR001", "whoops")
+	err := errors.ErrCode("ERR001", "whoops")
 	fmt.Println(err)
 	// Output:
 	// [ERR001] whoops
 }
 
 func ExampleNew_printf1() {
-	err := errors.New("ERR001", "whoops")
+	err := errors.ErrCode("ERR001", "whoops")
 	// err2 := errors.WithStack(err)
 	fmt.Printf("%s\n", err)
 	fmt.Printf("%v\n", err)
@@ -26,7 +26,7 @@ func ExampleNew_printf1() {
 }
 
 func ExampleNew_printf2() {
-	err := errors.NewWithStack("ERR001", "whoops")
+	err := errors.TraceableErrCode("ERR001", "whoops")
 	fmt.Printf("%+v\n", err)
 	// Output:
 	// [ERR001] whoops
@@ -43,7 +43,7 @@ func ExampleNew_printf2() {
 func openNotExistsFile() (*os.File, error) {
 	f, err := os.Open("/not_exists_file.txt")
 	if err != nil {
-		return nil, errors.WithCode(err, "ERR404", "File not found")
+		return nil, errors.WithErrCode(err, "ERR404", "File not found")
 	}
 	return f, nil
 }
@@ -58,7 +58,7 @@ func ExampleWithCode() {
 func openNotExistsFile2() (*os.File, error) {
 	f, err := os.Open("/not_exists_file.txt")
 	if err != nil {
-		return nil, errors.Wrap(err, "ERR404", "File not found")
+		return nil, errors.WrapNodup(err, "ERR404", "File not found")
 	}
 	return f, nil
 }

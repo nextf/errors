@@ -48,37 +48,44 @@ func GetCode(err error) (string, bool) {
 	}
 }
 
-func New(code, message string) error {
+func ErrCode(code, message string) error {
 	return &withErrCode{code, message, nil}
 }
 
-func Newf(code, format string, args ...interface{}) error {
+func ErrCodef(code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), nil}
 }
 
-func NewWithStack(code, message string) error {
+func TraceableErrCode(code, message string) error {
 	return &withErrCode{code, message, newErrorStack(1)}
 }
 
-func NewWithStackf(code, format string, args ...interface{}) error {
+func TraceableErrCodef(code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), newErrorStack(1)}
 }
 
-func WithCode(cause error, code, message string) error {
-	if cause == nil {
+// func WithNodupErrCode(err error, code, message string) error {
+// 	if err == nil {
+// 		return nil
+// 	}
+// 	if x, ok := GetCode(err); ok && code == x {
+// 		return err
+// 	}
+// 	return &withErrCode{code, message, err}
+// }
+
+func WithErrCode(err error, code, message string) error {
+	if err == nil {
 		return nil
 	}
-	if _, ok := GetCode(cause); ok {
-		return cause
-	}
-	return &withErrCode{code, message, cause}
+	return &withErrCode{code, message, err}
 }
 
-func WithCodePile(cause error, code, message string) error {
-	if cause == nil {
+func WithErrCodef(err error, code, format string, args ...interface{}) error {
+	if err == nil {
 		return nil
 	}
-	return &withErrCode{code, message, cause}
+	return &withErrCode{code, fmt.Sprintf(format, args...), err}
 }
 
 func HasErrorStack(err error) bool {
@@ -95,7 +102,7 @@ func HasErrorStack(err error) bool {
 	}
 }
 
-func withStackIfAbsent(skip int, err error) error {
+func withStackIfAbsent(err error, skip int) error {
 	if HasErrorStack(err) {
 		return err
 	} else {
@@ -103,73 +110,64 @@ func withStackIfAbsent(skip int, err error) error {
 	}
 }
 
-// var WithStack = pkgerr.WithStack
-func WithStack(cause error) error {
-	if cause == nil {
+func TraceNodup(err error) error {
+	if err == nil {
 		return nil
 	}
-	return withStackIfAbsent(1, cause)
+	return withStackIfAbsent(err, 1)
 }
 
-func WithStackPile(err error) error {
+func Trace(err error) error {
 	if err == nil {
 		return nil
 	}
 	return withErrorStack(err, 1)
 }
 
+func WrapNodup(err error, code, message string) error {
+	if err == nil {
+		return nil
+	}
+	err = withStackIfAbsent(err, 1)
+	return &withErrCode{code, message, err}
+}
+
+func WrapNodupf(err error, code, format string, args ...interface{}) error {
+	if err == nil {
+		return nil
+	}
+	err = withStackIfAbsent(err, 1)
+	return &withErrCode{code, fmt.Sprintf(format, args...), err}
+}
+
 func Wrap(err error, code, message string) error {
-	if err == nil {
-		return nil
-	}
-	err = withStackIfAbsent(1, err)
-	if _, ok := GetCode(err); !ok {
-		err = &withErrCode{code, message, err}
-	}
-	return err
-}
-
-func Wrapf(err error, code, format string, args ...interface{}) error {
-	if err == nil {
-		return nil
-	}
-	err = withStackIfAbsent(1, err)
-	if _, ok := GetCode(err); !ok {
-		err = &withErrCode{code, fmt.Sprintf(format, args...), err}
-	}
-	return err
-}
-
-func WrapPile(err error, code, message string) error {
 	if err == nil {
 		return nil
 	}
 	return &withErrCode{code, message, withErrorStack(err, 1)}
 }
 
-func WrapPilef(err error, code, format string, args ...interface{}) error {
+func Wrapf(err error, code, format string, args ...interface{}) error {
 	if err == nil {
 		return nil
 	}
 	return &withErrCode{code, fmt.Sprintf(format, args...), withErrorStack(err, 1)}
 }
 
-// Deprecated: Too simple. Use errors.New instead.
-func Message(message string) error {
-	return stderr.New(message)
+func New(message string) error {
+	return ConstError(message)
 }
 
-// Deprecated: Too simple. Use errors.Newf instead.
-func Messagef(format string, args ...interface{}) error {
-	return fmt.Errorf(format, args...)
+func Errorf(format string, args ...interface{}) error {
+	return ConstError(fmt.Sprintf(format, args...))
 }
 
 // Deprecated: Too simple. Use errors.Wrap instead.
-func WithMessage(err error, message string) error {
-	return &errorMessage{message, withStackIfAbsent(1, err)}
+func TraceMessage(err error, message string) error {
+	return &errorMessage{message, withStackIfAbsent(err, 1)}
 }
 
 // Deprecated: Too simple. Use errors.Wrapf instead.
-func WithMessagef(err error, format string, args ...interface{}) error {
-	return &errorMessage{fmt.Sprintf(format, args...), withStackIfAbsent(1, err)}
+func TraceMessagef(err error, format string, args ...interface{}) error {
+	return &errorMessage{fmt.Sprintf(format, args...), withStackIfAbsent(err, 1)}
 }
