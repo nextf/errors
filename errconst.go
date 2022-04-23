@@ -1,14 +1,17 @@
 package errors
 
-import "regexp"
+import (
+	"regexp"
+	"strings"
+)
 
 type ConstError string
 
-var regForErrCode *regexp.Regexp = regexp.MustCompile(`^\s*\[([A-Za-z0-9_-]+)\]\s*(.*)\s*$`)
+var regForErrCode *regexp.Regexp = regexp.MustCompile(`^\s*\[([A-Za-z0-9_-]+)\]\s*(.*)$`)
 
 func (e ConstError) Error() string {
 	if group := regForErrCode.FindStringSubmatch(string(e)); len(group) >= 3 {
-		return group[2]
+		return strings.TrimSpace(group[2])
 	}
 	return string(e)
 }

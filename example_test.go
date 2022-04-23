@@ -35,7 +35,7 @@ func ExampleNew_printf2() {
 	//     testing.runExample(run_example.go:64)
 	//     testing.runExamples(example.go:44)
 	//     testing.(*M).Run(testing.go:1505)
-	//     main.main(_testmain.go:75)
+	//     main.main(_testmain.go:77)
 	//     runtime.main(proc.go:255)
 	//     runtime.goexit(asm_amd64.s:1581)
 }
@@ -47,7 +47,7 @@ func openNotExistsFile() (*os.File, error) {
 	}
 	return f, nil
 }
-func ExampleWithCode() {
+func ExampleWithErrCode() {
 	_, err := openNotExistsFile()
 	fmt.Printf("%+v", err)
 	// Output:
@@ -74,7 +74,7 @@ func ExampleWrap() {
 	//     testing.runExample(run_example.go:64)
 	//     testing.runExamples(example.go:44)
 	//     testing.(*M).Run(testing.go:1505)
-	//     main.main(_testmain.go:75)
+	//     main.main(_testmain.go:77)
 	//     runtime.main(proc.go:255)
 	//     runtime.goexit(asm_amd64.s:1581)
 	// Caused by: open /not_exists_file.txt: The system cannot find the file specified.
