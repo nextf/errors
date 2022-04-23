@@ -74,6 +74,31 @@ func TestErrCodeFormat(t *testing.T) {
 	}
 }
 
+func TestWithErrCode(t *testing.T) {
+	err := errors.ErrCode("ROOT", "Level 0")
+	times := 10
+	for i := 1; i < times; i++ {
+		err = errors.WithErrCode(err, fmt.Sprintf("L%d", i), fmt.Sprintf("Level %d", i))
+	}
+	counter := 0
+	level := 0
+	for {
+		level++
+		if _, ok := err.(interface{ Code() string }); ok {
+			counter++
+		}
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+	if counter != times {
+		t.Errorf("Expect %d, got %d", times, counter)
+	}
+	if level != times {
+		t.Errorf("Expect %d, got %d", times, level)
+	}
+}
+
 func TestWithStackNodup(t *testing.T) {
 	err := errors.ErrCode("ROOT", "Level 0")
 	times := 10
@@ -83,19 +108,19 @@ func TestWithStackNodup(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
+		level++
 		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
 			break
 		}
-		level++
 	}
 	if counter != 1 {
 		t.Errorf("Expect %d, got %d", 1, counter)
 	}
-	if level != 1 {
-		t.Errorf("Expect %d, got %d", 1, level)
+	if level != 2 {
+		t.Errorf("Expect %d, got %d", 2, level)
 	}
 }
 
@@ -108,19 +133,19 @@ func TestTraceMessage(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
+		level++
 		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
 			break
 		}
-		level++
 	}
 	if counter != 1 {
 		t.Errorf("Expect %d, got %d", 1, counter)
 	}
-	if level != times {
-		t.Errorf("Expect %d, got %d", times, level)
+	if level != times+1 {
+		t.Errorf("Expect %d, got %d", times+1, level)
 	}
 }
 
@@ -133,19 +158,19 @@ func TestTraceMessagef(t *testing.T) {
 	counter := 0
 	level := 0
 	for {
+		level++
 		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
 			counter++
 		}
 		if err = errors.Unwrap(err); err == nil {
 			break
 		}
-		level++
 	}
 	if counter != 1 {
 		t.Errorf("Expect %d, got %d", 1, counter)
 	}
-	if level != times {
-		t.Errorf("Expect %d, got %d", times, level)
+	if level != times+1 {
+		t.Errorf("Expect %d, got %d", times+1, level)
 	}
 }
 
@@ -206,7 +231,7 @@ func TestTraceableErrCodef(t *testing.T) {
 func TestWrapNodup(t *testing.T) {
 	err := errors.New("[ROOT_ERROR] Root level")
 	times := 10
-	for i := 1; i <= times; i++ {
+	for i := 1; i < times; i++ {
 		err = errors.WrapNodup(err, fmt.Sprintf("L%d", i), fmt.Sprintf("Level %d", i))
 	}
 	stackCounter := 0
@@ -214,6 +239,7 @@ func TestWrapNodup(t *testing.T) {
 	level := 0
 	errTmp := err
 	for {
+		level++
 		if _, ok := errTmp.(interface{ StackTrace() []stack.Frame }); ok {
 			stackCounter++
 		}
@@ -223,13 +249,12 @@ func TestWrapNodup(t *testing.T) {
 		if errTmp = errors.Unwrap(errTmp); errTmp == nil {
 			break
 		}
-		level++
 	}
 	if stackCounter != 1 {
 		t.Errorf("Expect %d, got %d", 1, stackCounter)
 	}
-	if codeCounter != times+1 {
-		t.Errorf("Expect %d, got %d", times+1, codeCounter)
+	if codeCounter != times {
+		t.Errorf("Expect %d, got %d", times, codeCounter)
 	}
 	if level != times+1 {
 		t.Errorf("Expect %d, got %d", times+1, level)
@@ -247,6 +272,7 @@ func TestWrap(t *testing.T) {
 	level := 0
 	errTmp := err
 	for {
+		level++
 		if _, ok := errTmp.(interface{ StackTrace() []stack.Frame }); ok {
 			stackCounter++
 		}
@@ -256,7 +282,6 @@ func TestWrap(t *testing.T) {
 		if errTmp = errors.Unwrap(errTmp); errTmp == nil {
 			break
 		}
-		level++
 	}
 	if stackCounter != times {
 		t.Errorf("Expect %d, got %d", times, stackCounter)
@@ -264,7 +289,7 @@ func TestWrap(t *testing.T) {
 	if codeCounter != times+1 {
 		t.Errorf("Expect %d, got %d", times+1, codeCounter)
 	}
-	if level != times*2 {
-		t.Errorf("Expect %d, got %d", times*2, level)
+	if level != times*2+1 {
+		t.Errorf("Expect %d, got %d", times*2+1, level)
 	}
 }
