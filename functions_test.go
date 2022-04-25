@@ -176,7 +176,7 @@ func TestTraceMessagef(t *testing.T) {
 
 func TestErrCode(t *testing.T) {
 	err := errors.ErrCode("NEW_IN_FUNC", "error for unittest")
-	if errors.HasErrorStack(err) {
+	if errors.HasStackTrace(err) {
 		t.Errorf("It was expected that there would be no StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -189,7 +189,7 @@ func TestErrCode(t *testing.T) {
 
 func TestTraceableErrCode(t *testing.T) {
 	err := errors.TraceableErrCode("NEW_IN_FUNC", "error for unittest")
-	if !errors.HasErrorStack(err) {
+	if !errors.HasStackTrace(err) {
 		t.Errorf("It was expected that there would has StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -203,7 +203,7 @@ func TestTraceableErrCode(t *testing.T) {
 func TestErrCodef(t *testing.T) {
 	num := rand.Int()
 	err := errors.ErrCodef("NEW_IN_FUNC", "Wrong number [%d]", num)
-	if errors.HasErrorStack(err) {
+	if errors.HasStackTrace(err) {
 		t.Errorf("It was expected that there would be no StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -217,7 +217,7 @@ func TestErrCodef(t *testing.T) {
 func TestTraceableErrCodef(t *testing.T) {
 	num := rand.Int()
 	err := errors.TraceableErrCodef("NEW_IN_FUNC", "Wrong number [%d]", num)
-	if !errors.HasErrorStack(err) {
+	if !errors.HasStackTrace(err) {
 		t.Errorf("It was expected that there would has StackTrace in the `err`, but it wasn't.")
 	}
 	if code, ok := errors.GetCode(err); !ok || code != "NEW_IN_FUNC" {
@@ -291,5 +291,58 @@ func TestWrap(t *testing.T) {
 	}
 	if level != times*2+1 {
 		t.Errorf("Expect %d, got %d", times*2+1, level)
+	}
+}
+
+func TestTrace(t *testing.T) {
+	err := errors.New("[ROOT_ERROR] Root level")
+	if errors.HasStackTrace(err) {
+		t.Errorf("It was expected that there would be no StackTrace in the `err`, but it wasn't.")
+	}
+	times := 10
+	for i := 0; i < times; i++ {
+		err = errors.Trace(err)
+	}
+	counter := 0
+	level := 0
+	for {
+		level++
+		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
+			counter++
+		}
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+	if counter != times {
+		t.Errorf("Expect %d, got %d", times, counter)
+	}
+	if level != times+1 {
+		t.Errorf("Expect %d, got %d", times+1, level)
+	}
+}
+
+func TestTraceNodup(t *testing.T) {
+	err := errors.New("[ROOT_ERROR] Root level")
+	times := 10
+	for i := 0; i < times; i++ {
+		err = errors.TraceNodup(err)
+	}
+	counter := 0
+	level := 0
+	for {
+		level++
+		if _, ok := err.(interface{ StackTrace() []stack.Frame }); ok {
+			counter++
+		}
+		if err = errors.Unwrap(err); err == nil {
+			break
+		}
+	}
+	if counter != 1 {
+		t.Errorf("Expect %d, got %d", 1, counter)
+	}
+	if level != 2 {
+		t.Errorf("Expect %d, got %d", 2, level)
 	}
 }

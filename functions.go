@@ -64,16 +64,6 @@ func TraceableErrCodef(code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), newErrorStack(1)}
 }
 
-// func WithNodupErrCode(err error, code, message string) error {
-// 	if err == nil {
-// 		return nil
-// 	}
-// 	if x, ok := GetCode(err); ok && code == x {
-// 		return err
-// 	}
-// 	return &withErrCode{code, message, err}
-// }
-
 func WithErrCode(err error, code, message string) error {
 	if err == nil {
 		return nil
@@ -88,7 +78,7 @@ func WithErrCodef(err error, code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), err}
 }
 
-func HasErrorStack(err error) bool {
+func HasStackTrace(err error) bool {
 	if err == nil {
 		return false
 	}
@@ -103,7 +93,7 @@ func HasErrorStack(err error) bool {
 }
 
 func withStackIfAbsent(err error, skip int) error {
-	if HasErrorStack(err) {
+	if HasStackTrace(err) {
 		return err
 	} else {
 		return withErrorStack(err, skip+1)
