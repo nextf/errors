@@ -41,7 +41,11 @@ func (c *withErrCode) Format(s fmt.State, verb rune) {
 	case 'v':
 		fmt.Fprintf(s, "[%s] %s", c.code, c.message)
 		if s.Flag('+') && c.cause != nil {
-			fmt.Fprintf(s, "\nCaused by: %+v", c.cause)
+			formatCause := "\nCaused by: %+v"
+			if width, ok := s.Width(); ok {
+				formatCause = fmt.Sprintf("\nCaused by: %%+%dv", width)
+			}
+			fmt.Fprintf(s, formatCause, c.cause)
 		}
 	case 's':
 		io.WriteString(s, c.message)

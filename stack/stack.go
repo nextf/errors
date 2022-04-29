@@ -2,6 +2,7 @@ package stack
 
 import (
 	"fmt"
+	"io"
 	"path"
 	"runtime"
 )
@@ -19,7 +20,7 @@ func RecordCallStack(skip, maxDepth int) CallStack {
 	return rpc[:n]
 }
 
-func (s CallStack) String() string {
+func (s CallStack) string() string {
 	var buff []byte
 	for _, frame := range s.StackTrace() {
 		buff = append(buff, []byte(fmt.Sprintf("%s\n", frame))...)
@@ -28,6 +29,43 @@ func (s CallStack) String() string {
 		buff = buff[:len(buff)-1]
 	}
 	return string(buff)
+}
+
+const tab string = "\x20\x20\x20\x20"
+
+func (c CallStack) Format(s fmt.State, verb rune) {
+	var indent string
+	if s.Flag('+') {
+		indent = tab
+	}
+	switch verb {
+	case 'v':
+		frames := c.StackTrace()
+		framesSize := len(frames)
+		maxDepth := framesSize
+		if wid, ok := s.Width(); ok && wid < maxDepth {
+			maxDepth = wid
+		}
+		i := 0
+		for {
+			fmt.Fprintf(s, "%s%s", indent, frames[i].String())
+			i++
+			if i < maxDepth {
+				// Has more lines
+				io.WriteString(s, "\n")
+			} else {
+				break
+			}
+		}
+		if maxDepth < framesSize {
+			// Collapse
+			fmt.Fprintf(s, "\n%s...(more:%d)", indent, framesSize-maxDepth)
+		}
+	case 's':
+		io.WriteString(s, c.string())
+	case 'q':
+		fmt.Fprintf(s, "%q", c.string())
+	}
 }
 
 func (s CallStack) StackTrace() []Frame {
