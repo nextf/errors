@@ -37,6 +37,7 @@ func (c *errorStack) Error() string {
 	return c.cause.Error()
 }
 
+// Unwrap provides compatibility for Go 1.13 error chains.
 func (c *errorStack) Unwrap() error {
 	return c.cause
 }

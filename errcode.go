@@ -46,6 +46,7 @@ func (c *withErrCode) Match(key interface{}) bool {
 	return false
 }
 
+// Unwrap provides compatibility for Go 1.13 error chains.
 func (c *withErrCode) Unwrap() error {
 	return c.cause
 }

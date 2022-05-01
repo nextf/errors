@@ -24,6 +24,7 @@ import (
 type CallStack []uintptr
 type Frame runtime.Frame
 
+// RecordCallStack records the stack trace at the point it was called.
 func RecordCallStack(skip, maxDepth int) CallStack {
 	rpc := make([]uintptr, maxDepth)
 	baseSkip := 2
@@ -82,6 +83,7 @@ func (c CallStack) Format(s fmt.State, verb rune) {
 	}
 }
 
+// StackTrace returns the frames that records the stack trace.
 func (s CallStack) StackTrace() []Frame {
 	frames := runtime.CallersFrames(s)
 	var buff []Frame
@@ -95,6 +97,7 @@ func (s CallStack) StackTrace() []Frame {
 	return buff
 }
 
+// Describe returns a brief description.
 func (f Frame) Describe() string {
 	_, file := path.Split(f.File)
 	return fmt.Sprintf("%s(%s:%d)", f.Function, file, f.Line)

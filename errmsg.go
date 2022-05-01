@@ -28,6 +28,7 @@ func (c *errorMessage) Error() string {
 	return c.message
 }
 
+// Unwrap provides compatibility for Go 1.13 error chains.
 func (c *errorMessage) Unwrap() error {
 	return c.cause
 }
