@@ -23,7 +23,7 @@ func RecordCallStack(skip, maxDepth int) CallStack {
 func (s CallStack) string() string {
 	var buff []byte
 	for _, frame := range s.StackTrace() {
-		buff = append(buff, []byte(fmt.Sprintf("%s\n", frame))...)
+		buff = append(buff, []byte(fmt.Sprintf("%s\n", frame.Describe()))...)
 	}
 	if len(buff) > 0 {
 		buff = buff[:len(buff)-1]
@@ -48,7 +48,7 @@ func (c CallStack) Format(s fmt.State, verb rune) {
 		}
 		i := 0
 		for {
-			fmt.Fprintf(s, "%s%s", indent, frames[i].String())
+			fmt.Fprintf(s, "%s%s", indent, frames[i].Describe())
 			i++
 			if i < maxDepth {
 				// Has more lines
@@ -81,7 +81,7 @@ func (s CallStack) StackTrace() []Frame {
 	return buff
 }
 
-func (f Frame) String() string {
+func (f Frame) Describe() string {
 	_, file := path.Split(f.File)
 	return fmt.Sprintf("%s(%s:%d)", f.Function, file, f.Line)
 }
