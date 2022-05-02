@@ -67,12 +67,26 @@ func Unwrap(err error) error {
 	return stderr.Unwrap(err)
 }
 
-func Match(err error, key interface{}) bool {
+// Match reports whether any error in err's chain matches key.
+//
+// The chain consists of err itself followed by the sequence of errors obtained by
+// repeatedly calling Unwrap.
+//
+// An error if it implements a method Match(key) bool such that Match(target)
+// returns true.
+//
+// An error type might provide an Match method so it can be treated as equivalent
+// to an existing error. For example, if MyError defines
+//
+//	func (m MyError) Match(key interface{}) bool { return m.code == key }
+//
+// then Match(MyError{code:"ERR001"}, "ERR001") returns true.
+func Match(err error, target interface{}) bool {
 	if err == nil {
 		return false
 	}
 	for {
-		if x, ok := err.(interface{ Match(interface{}) bool }); ok && x.Match(key) {
+		if x, ok := err.(interface{ Match(interface{}) bool }); ok && x.Match(target) {
 			return true
 		}
 		if err = Unwrap(err); err == nil {
@@ -81,6 +95,9 @@ func Match(err error, key interface{}) bool {
 	}
 }
 
+// GetCode finds the first error in err's chain that implements a method Code() string,
+// and if so, returns the code extracted from error and the boolean is true.
+// Otherwise the returned value will be empty and the boolean will be false.
 func GetCode(err error) (string, bool) {
 	if err == nil {
 		return "", false
@@ -191,10 +208,14 @@ func Wrapf(err error, code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), withErrorStack(err, 1)}
 }
 
+// New returns an error with the supplied message.
+// If a message begins with code enclosed in [], that code is considered an error code.
 func New(message string) error {
 	return ConstError(message)
 }
 
+// Errorf formats according to a format specifier and returns the string as a value that satisfies error.
+// If a string begins with code enclosed in [], that code is considered an error code.
 func Errorf(format string, args ...interface{}) error {
 	return ConstError(fmt.Sprintf(format, args...))
 }
