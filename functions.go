@@ -78,7 +78,9 @@ func Unwrap(err error) error {
 // An error type might provide an Match method so it can be treated as equivalent
 // to an existing error. For example, if MyError defines
 //
-//	func (m MyError) Match(key interface{}) bool { return m.code == key }
+//	func (m MyError) Match(key interface{}) bool {
+//	  return m.code == key
+//	}
 //
 // then Match(MyError{code:"ERR001"}, "ERR001") returns true.
 func Match(err error, target interface{}) bool {
@@ -112,22 +114,31 @@ func GetCode(err error) (string, bool) {
 	}
 }
 
+// ErrCode returns an error with error code and message.
 func ErrCode(code, message string) error {
 	return &withErrCode{code, message, nil}
 }
 
+// ErrCodef returns an error with an error code and a message that is formatted
+// according to the format specifier.
 func ErrCodef(code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), nil}
 }
 
+// TraceableErrCode returns an error with call stack information and error code
+// and message.
 func TraceableErrCode(code, message string) error {
 	return &withErrCode{code, message, newErrorStack(1)}
 }
 
+// TraceableErrCodef returns an error with call stack information and error code
+// and a message formatted according to the format specifier.
 func TraceableErrCodef(code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), newErrorStack(1)}
 }
 
+// WithErrCode annotates err with an error code and message.
+// If err is nil, WithErrCode returns nil.
 func WithErrCode(err error, code, message string) error {
 	if err == nil {
 		return nil
@@ -135,6 +146,9 @@ func WithErrCode(err error, code, message string) error {
 	return &withErrCode{code, message, err}
 }
 
+// WithErrCode annotates err with an error code and a message that is formatted
+// according to the format specifier.
+// If err is nil, WithErrCode returns nil.
 func WithErrCodef(err error, code, format string, args ...interface{}) error {
 	if err == nil {
 		return nil
@@ -142,6 +156,7 @@ func WithErrCodef(err error, code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), err}
 }
 
+// HasStackTrace reports whether has call stack information in err's chain.
 func HasStackTrace(err error) bool {
 	if err == nil {
 		return false
@@ -214,7 +229,8 @@ func New(message string) error {
 	return ConstError(message)
 }
 
-// Errorf formats according to a format specifier and returns the string as a value that satisfies error.
+// Errorf formats according to a format specifier and returns the string as a value
+// that satisfies error.
 // If a string begins with code enclosed in [], that code is considered an error code.
 func Errorf(format string, args ...interface{}) error {
 	return ConstError(fmt.Sprintf(format, args...))
