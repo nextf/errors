@@ -179,6 +179,9 @@ func withStackIfAbsent(err error, skip int) error {
 	}
 }
 
+// Trace annotates err with a call stack information at the point Trace was called.
+// If the err already contains call stack information, Trace returns the err itself.
+// If err is nil, Trace returns nil.
 func TraceNodup(err error) error {
 	if err == nil {
 		return nil
@@ -186,6 +189,8 @@ func TraceNodup(err error) error {
 	return withStackIfAbsent(err, 1)
 }
 
+// Trace annotates err with a call stack information at the point Trace was called.
+// If err is nil, Trace returns nil.
 func Trace(err error) error {
 	if err == nil {
 		return nil
@@ -193,6 +198,11 @@ func Trace(err error) error {
 	return withErrorStack(err, 1)
 }
 
+// WrapNodup returns an error annotating err with a call stack information
+// at the point WrapNodup was called, and an error code and message.
+// If the err already contains call stack information, than annotation
+// is not repeated.
+// If err is nil, WrapNodup returns nil.
 func WrapNodup(err error, code, message string) error {
 	if err == nil {
 		return nil
@@ -201,6 +211,12 @@ func WrapNodup(err error, code, message string) error {
 	return &withErrCode{code, message, err}
 }
 
+// WrapNodupf returns an error annotating err with a call stack information
+// at the point WrapNodupf was called, and an error code and a message that
+// is formatted according to the format specifier.
+// If the err already contains call stack information, than annotation
+// is not repeated.
+// If err is nil, WrapNodupf returns nil.
 func WrapNodupf(err error, code, format string, args ...interface{}) error {
 	if err == nil {
 		return nil
@@ -209,6 +225,9 @@ func WrapNodupf(err error, code, format string, args ...interface{}) error {
 	return &withErrCode{code, fmt.Sprintf(format, args...), err}
 }
 
+// Wrap returns an error annotating err with a call stack information
+// at the point Wrap was called, and an error code and message.
+// If err is nil, Wrap returns nil.
 func Wrap(err error, code, message string) error {
 	if err == nil {
 		return nil
@@ -216,6 +235,10 @@ func Wrap(err error, code, message string) error {
 	return &withErrCode{code, message, withErrorStack(err, 1)}
 }
 
+// Wrapf returns an error annotating err with a call stack information
+// at the point Wrapf was called, and an error code and a message that
+// is formatted according to the format specifier.
+// If err is nil, Wrapf returns nil.
 func Wrapf(err error, code, format string, args ...interface{}) error {
 	if err == nil {
 		return nil
